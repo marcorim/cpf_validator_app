@@ -1,17 +1,19 @@
+import 'dart:math';
+
 class CpfModel {
   final String _value;
   late final String _valueWithMask;
-  late final List<int> _digits;
+  late List<int> _digits;
   final int _firstIndexDigit = 9;
-  final int _secondIndexDigit = 10;
+  final int _secondIndexDigit = 10; 
 
   CpfModel(this._value){
     _valueWithMask = _cleanMask();
-    _digits = _convertValueListDigits();
+    _digits = _convertValueListDigits(_valueWithMask);
   }
 
-  List<int> _convertValueListDigits() {
-   return _valueWithMask.split('').map(int.parse).toList();
+  List<int> _convertValueListDigits(String value) {
+   return value.split('').map(int.parse).toList();
   }
 
   String _cleanMask() {
@@ -36,6 +38,22 @@ class CpfModel {
     return digit;
   }
 
+  int _calculateDigit(int ponderosity) {
+    var digit = 0;
+    var digitIndex = 0;
+    var multiply = ponderosity;
+    for (var i = _digits.length; i >= 1; i--) {
+      digit += _digits[digitIndex] * multiply;
+      digitIndex++;
+      multiply = multiply - 1;
+    }
+
+    digit = digit % 11;
+    digit = digit < 2 ? 0 : 11 - digit;
+
+    return digit;
+  }
+
   bool isValid() {
     final bool isValidLength = (_digits.length == 11);
     final bool isAllDigitsNotEqual = !(_digits.toSet().length == 1);
@@ -49,5 +67,21 @@ class CpfModel {
       && isAllDigitsNotEqual;
 
     return isValid;
+  }
+
+  String createCpf() {
+    var rng = Random();
+    String value = ''; 
+
+    for (var i = 0; i < 9; i++) {
+      value += rng.nextInt(10).toString();
+    }
+
+    _digits = _convertValueListDigits(value);
+    value += _calculateDigit(10).toString();
+    _digits = _convertValueListDigits(value);
+    value += _calculateDigit(11).toString();
+
+    return value;
   }
 }
