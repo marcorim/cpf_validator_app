@@ -1,6 +1,7 @@
 import 'dart:math';
 
 class CpfModel {
+  var _random = Random();
   final String _value;
   late final String _valueWithMask;
   late List<int> _digits;
@@ -69,18 +70,29 @@ class CpfModel {
     return isValid;
   }
 
+  int _randomNumber() {
+    return _random.nextInt(10);
+  }
+
+  int _calculateFirstDigit() {
+    return _calculateDigit(10);
+  }
+
+  int _calculateSecondDigit() {
+    return _calculateDigit(11);
+  }
+
   String createCpf() {
-    var rng = Random();
     String value = ''; 
 
     for (var i = 0; i < 9; i++) {
-      value += rng.nextInt(10).toString();
+      value += _randomNumber().toString();
     }
 
     _digits = _convertValueListDigits(value);
-    value += _calculateDigit(10).toString();
+    value += _calculateFirstDigit().toString();
     _digits = _convertValueListDigits(value);
-    value += _calculateDigit(11).toString();
+    value += _calculateSecondDigit().toString();
 
     return value;
   }
